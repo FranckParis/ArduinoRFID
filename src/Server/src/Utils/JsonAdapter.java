@@ -1,6 +1,6 @@
-package Utils;
+package Server.src.Utils;
 
-import Ressources.Key;
+import Server.src.Ressources.Key;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 

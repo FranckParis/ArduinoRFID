@@ -1,4 +1,4 @@
-package Utils;
+package Server.src.Utils;
 
 import java.io.*;
 
@@ -38,10 +38,10 @@ public class FileReaderUtil {
         }
 
         if(keyFound){
-            System.out.println("Key found in file");
+            System.out.println("Key found in file : " + key);
         }
         else{
-            System.out.println("Key not found in file");
+            System.out.println("Key not found in file : " + key);
         }
 
         return keyFound;

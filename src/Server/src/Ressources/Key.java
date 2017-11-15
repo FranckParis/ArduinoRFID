@@ -1,4 +1,4 @@
-package Ressources;
+package Server.src.Ressources;
 
 public class Key {
 
