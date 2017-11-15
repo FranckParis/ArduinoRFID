@@ -52,6 +52,7 @@ WiFi.begin("Muchas Arachas", "tchikitchiki");
 
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
+  Serial.println();
 }
 
 void loop()
@@ -75,50 +76,58 @@ void loop()
     return;
   }
 
+  //Get card UID
   cardUid = getCardUid(mfrc522.uid.uidByte, mfrc522.uid.size);
   Serial.println("Card UID : " + cardUid);
 
+  //Create JSON
   JsonObject& json = jsonBuffer.createObject();
   json["UID"] = cardUid;
 
-  json.printTo(Serial);
-  Serial.println("");
-
+  //convert JSON to String
   char JSONmessageBuffer[40];
   json.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
-
   Serial.println(JSONmessageBuffer);
 
   // Use WiFiClient class to create TCP connections
+  Serial.println("Connect to server...");
   WiFiClient client;
   const int port = 3586;
   if (!client.connect(host, port)) {
     Serial.println("connection failed");
     return;
   }
+  Serial.println("Connected");
 
   // This will send the request to the server
+  Serial.println("Send JSON to server");
   client.println(JSONmessageBuffer);
   
-  Serial.println("[Response:]");
+  Serial.print("Response: ");
   //read back one line from server
   String line = client.readStringUntil('.');
   Serial.println(line);
 
   Serial.println("closing connection");
   client.stop();
-  Serial.println("\n[Disconnected]");
+  Serial.println("Disconnected");
 
-  if(line == "1"){
-    Serial.println("OK");
-    openDoor();
-  }
-  else{
-    Serial.println("NOPE");
-    lockDoor();
+  switch(line.toInt()){
+    case 1:
+      sayOk();
+      break;
+
+    case 2:
+      sayAddCard();
+      break;
+
+    dafault:
+      sayNOk();
+      break;
   }
   
   delay(1000);
+  Serial.println();
 }
 
 String getCardUid(byte *buffer, byte bufferSize)
@@ -131,16 +140,32 @@ String getCardUid(byte *buffer, byte bufferSize)
   return uid;
 }
 
-void openDoor()
+void sayAddCard(){
+  Serial.println("Add new card");
+  
+  digitalWrite(RELAY, HIGH);
+  delay(100);
+  digitalWrite(RELAY, LOW);
+  delay(100);
+  digitalWrite(RELAY, HIGH);
+  delay(100);
+  digitalWrite(RELAY, LOW);
+}
+
+void sayOk()
 {
+  Serial.println("OK");
+  
   digitalWrite(RELAY, HIGH);
   delay(200);
   digitalWrite(RELAY, LOW);
 }
 
 
-void lockDoor()
+void sayNOk()
 {
+  Serial.println("NOK");
+  
   digitalWrite(RELAY, HIGH);
   delay(200);
   digitalWrite(RELAY, LOW);
