@@ -1,23 +1,17 @@
 package Server.src.Utils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class FileReaderUtil {
 
-    private FileReader fileReader;
     private File file;
-    private BufferedReader bufferedReader;
 
     public FileReaderUtil(String fileName) {
-        try {
-            this.file = new File(fileName);
-            this.fileReader = new FileReader(file);
-            this.bufferedReader = new BufferedReader(fileReader);
 
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-            e.printStackTrace();
-        }
+        this.file = new File(fileName);
     }
 
     public boolean checkInFile(String key){
@@ -25,6 +19,14 @@ public class FileReaderUtil {
         StringBuffer stringBuffer = new StringBuffer();
         String line;
         Boolean keyFound = false;
+        FileReader fileReader = null;
+
+        try {
+            fileReader = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
 
         //Reading file to find key
         try {
@@ -44,7 +46,22 @@ public class FileReaderUtil {
             System.out.println("Key not found in file : " + key);
         }
 
+        try {
+            bufferedReader.close();
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return keyFound;
     }
 
+    public void addInFile(String key){
+        try {
+            Files.write(Paths.get("src/Server/src/Ressources/keys.txt"), (key+"\n").getBytes(), StandardOpenOption.APPEND);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -7,10 +7,14 @@ import java.net.Socket;
 public class Server {
 
     private ServerSocket socket;
+    private String masterKey;
+    private boolean masterKeyChecked;
 
-    public Server(int port) {
+    public Server(int port, String masterKey) {
         try {
             this.socket = new ServerSocket(port);
+            this.masterKey = masterKey;
+            this.masterKeyChecked = false;
 
         } catch (IOException e)
         {
@@ -28,10 +32,10 @@ public class Server {
                 Socket socket = this.socket.accept();
 
                 //Server.Connection detected
-                Connection c = new Connection(socket, cpt);
-                (new Thread(() -> c.run())).start();
+                Connection c = new Connection(socket, cpt, this.masterKey, masterKeyChecked);
+                //(new Thread(() -> c.run())).start();
                 cpt++;
-                //c.run();
+                this.masterKeyChecked = c.run();
 
             } catch (IOException e) {
                 System.out.println("Server.Connection failed");
@@ -42,7 +46,7 @@ public class Server {
 
     //Main
     public static void main (String[] args){
-        Server srv = new Server(3586);
+        Server srv = new Server(3586, "22.38.158.172");
         srv.run();
     }
 }
